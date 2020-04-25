@@ -1,0 +1,74 @@
+________________________________________________
+[                 				]   
+[              LOCAL MACHINE  			]
+[===============================================] 
+[Configuration
+[-------------					]
+[host os - apple macos mojave v-10.14.6		]
+[guest os - debian 10				]
+[Cores - 2					]
+[RAM  - 4GB					]
+[CPU - Intel(R) Core(TM) i7-5650U CPU @ 2.20GHz	]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++-------------------+------------+---------+
+|     Scenario      | Time taken | Speedup |
++-------------------+------------+---------+
+| PSORT 1 Processes |      12.81 |       1 |
+| PSORT 4 Processes |       8.84 |    1.44 |
+| PSORT 8 Processes |       8.55 |    1.50 |
++-------------------+------------+---------+
+_________________________________________________
+[                 				]   
+[              	    CCIS	  		]
+[===============================================] 
+[Configuration
+[-----------------------------------------------]
+[OS - CentOS Linux v.7				]
+[Cores - 	48				]
+[RAM  - 	191GiB				]
+[CPU - Intel(R) Xeon(R) Gold 5118 CPU @ 2.30GHz ]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++-----------------+------------+---------+
+|    Scenario     | Time taken | Speedup |
++-----------------+------------+---------+
+| TSORT 1 Threads |      13.82 |       1 |
+| TSORT 4 Threads |       7.76 |    1.78 |
+| TSORT 8 Threads |       5.82 |    2.37 |
++-----------------+------------+---------+
++-------------------+------------+---------+
+|     Scenario      | Time taken | Speedup |
++-------------------+------------+---------+
+| PSORT 1 Processes |      17.10 |       1 |
+| PSORT 4 Processes |       7.20 |    2.34 |
+| PSORT 8 Processes |       4.96 |    3.45 |
++-------------------+------------+---------+
+
+Observation-
+----------------------
+Our parellel speed up is much less than expected. For instance 1 process vs 4 
+process speedup is expected to be ~4 but it is 1.44-same is true for thread
+
+Reasons - 
+----------------------
+There may be additional time taken in process scheduling, synchronization, context switching
+and using barriers which increases wait time to write. Another reason may be because we are randomly selecting
+samples that may result in unequal distribution of work load among processes.
+
+Threads vs Processes
+-----------------------
+Results shows threads perform better. A few reasons may be processes have to deal with context switching, and 
+care more about shared memory, synchronization and security which decreases the expected speedup even further.
+
+How good is Sample Sort
+-----------------------
+Although sample sort divides sorting workload between various processes, but since this work allocation is 
+random due to the way we did sampling, it does not necessarily performs as well as expected. An algorithm 
+which divides the workload equally would perform much better and give better speed up.
+
+Sample 61*(P-1) items
+-----------------------
+We got time as 16.78 for 1 thread and 3.26 for 8 threads in this case.
+Speed up = 5.14 which is better than previous value. We tried this with
+large size data of 50M but if we would have tried with smaller data size,
+this would have been more beneficial since the time taken in dividing and combining
+the result. Doing sequential work is beneficial while dealing with less data.
